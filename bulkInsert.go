@@ -66,7 +66,7 @@ func Builder[T any](sql string, arg []T, extractor func(row T) []any) (string, [
 			) //nolint:goerr113
 		}
 
-		insert(extractor(row)...)
+		insert(rowVals...)
 	}
 
 	return ReplaceValues(sql, valSQL.String()), values, nil
