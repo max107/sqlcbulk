@@ -8,7 +8,7 @@ import (
 )
 
 var paramsRegex = regexp.MustCompile(`(\$(\d+))`)
-var valuesRegex = regexp.MustCompile(`(?ims)VALUES \((.*?)\)$`)
+var valuesRegex = regexp.MustCompile(`(?ims)VALUES \((.*?)\)`)
 
 func FindColumns(sql string) []string {
 	return paramsRegex.FindAllString(sql, -1)

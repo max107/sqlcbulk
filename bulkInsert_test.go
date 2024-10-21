@@ -38,6 +38,26 @@ VALUES ($1, $2, $3, $4), ($5, $6, $7, $8), ($9, $10, $11, $12)
 ON CONFLICT (code) DO UPDATE SET code = EXCLUDED.code`, sql)
 	})
 
+	t.Run("replace_casesensitive", func(t *testing.T) {
+		t.Parallel()
+
+		sql := sqlcbulk.ReplaceValues(casesensitive, `($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12), ($13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)`)
+		require.Equal(t, `-- name: CreateProduct :one
+insert into products (uuid,
+                      name,
+                      code,
+                      price,
+                      category_id,
+                      weight,
+                      width,
+                      length,
+                      height,
+                      is_published,
+                      parent_id,
+                      variables)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12), ($13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24) returning id, uuid, code, name, description, category_id, price, is_remote, qty, weight, width, length, height, images, parent_id, variables, is_published, created_at`, sql)
+	})
+
 	t.Run("replace_multiline", func(t *testing.T) {
 		t.Parallel()
 
@@ -84,3 +104,29 @@ const singleline = `-- name: CreateCity :batchexec
 INSERT INTO cdek_city (code, city, fias_guid, city_uuid)
 VALUES ($1, $2, $3, $4)
 ON CONFLICT (code) DO UPDATE SET code = EXCLUDED.code`
+
+const casesensitive = `-- name: CreateProduct :one
+insert into products (uuid,
+                      name,
+                      code,
+                      price,
+                      category_id,
+                      weight,
+                      width,
+                      length,
+                      height,
+                      is_published,
+                      parent_id,
+                      variables)
+values ($1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $10,
+        $11,
+        $12) returning id, uuid, code, name, description, category_id, price, is_remote, qty, weight, width, length, height, images, parent_id, variables, is_published, created_at`
