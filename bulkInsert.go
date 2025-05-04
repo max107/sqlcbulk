@@ -65,7 +65,7 @@ func Builder[T any](sql string, arg []T, extractor func(row T) []any) (string, [
 		}
 
 		rowVals := extractor(row)
-		if len(rowVals) < columnCount {
+		if len(rowVals) != columnCount {
 			return "", nil, fmt.Errorf(
 				"mismatched param and argument count. received %d, expected %d. value: %+v",
 				len(rowVals),
