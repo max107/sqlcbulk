@@ -7,11 +7,19 @@ import (
 	"strings"
 )
 
-var paramsRegex = regexp.MustCompile(`(\$(\d+))`)
-var valuesRegex = regexp.MustCompile(`(?ims)VALUES \((.*?)\)`)
+var (
+	insertValuesRegex = regexp.MustCompile(`values\s+\(([^)]+)\)`)
+	paramsRegex       = regexp.MustCompile(`(\$(\d+))`)
+	valuesRegex       = regexp.MustCompile(`(?ims)VALUES \((.*?)\)`)
+)
 
 func FindColumns(sql string) []string {
-	return paramsRegex.FindAllString(sql, -1)
+	matches := insertValuesRegex.FindAllString(sql, -1)
+	if len(matches) != 1 {
+		return nil
+	}
+
+	return paramsRegex.FindAllString(matches[0], -1)
 }
 
 func ReplaceValues(sql, newSQL string) string {
@@ -57,7 +65,7 @@ func Builder[T any](sql string, arg []T, extractor func(row T) []any) (string, [
 		}
 
 		rowVals := extractor(row)
-		if len(rowVals) != columnCount {
+		if len(rowVals) < columnCount {
 			return "", nil, fmt.Errorf(
 				"mismatched param and argument count. received %d, expected %d. value: %+v",
 				len(rowVals),

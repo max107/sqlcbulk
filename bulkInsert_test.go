@@ -28,6 +28,25 @@ func TestBulkInsert(t *testing.T) {
 		}
 	})
 
+	t.Run("find columns", func(t *testing.T) {
+		t.Parallel()
+
+		require.Equal(t, []string{"$1", "$2", "$3"}, sqlcbulk.FindColumns(`with old as (select old.is_resolved
+             from event as old
+             where old.event_id = $4)
+insert
+into event (project_id,
+                   event_id,
+                   environment)
+values ($1,
+        $2,
+        $3)
+on conflict (hash) do update set count       = excluded.count + sentry_event.count,
+                                 is_resolved = false,
+                                 created_at  = now()
+returning event_id, project_id, environment, (select is_resolved from old) as is_regression`))
+	})
+
 	t.Run("replace_singleline", func(t *testing.T) {
 		t.Parallel()
 
