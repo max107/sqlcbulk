@@ -109,11 +109,44 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12), ($13, $14, $15, $16,
 	t.Run("replace_multiline", func(t *testing.T) {
 		t.Parallel()
 
-		sql := sqlcbulk.ReplaceValues(multiline, `($1, $2, $3, $4), ($5, $6, $7, $8), ($9, $10, $11, $12)`)
-		require.Equal(t, `-- name: CreateCity :batchexec
+		{
+			sql := sqlcbulk.ReplaceValues(multiline, `($1, $2, $3, $4), ($5, $6, $7, $8), ($9, $10, $11, $12)`)
+			require.Equal(t, `-- name: CreateCity :batchexec
 INSERT INTO cdek_city (code, city, fias_guid, city_uuid)
 VALUES ($1, $2, $3, $4), ($5, $6, $7, $8), ($9, $10, $11, $12)
 ON CONFLICT (code) DO UPDATE SET code = EXCLUDED.code`, sql)
+		}
+
+		{
+			sql := sqlcbulk.ReplaceValues(`-- name: CreateItem :batchexec
+INSERT INTO
+    item (
+        payment_id,
+        name,
+        qty,
+        payment_object,
+        payment_method,
+        vat,
+        price,
+        agent
+    )
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+`, `($1,$2,$3,$4,$5,$6,$7,$8),($9,$10,$11,$12,$13,$14,$15,$16)`)
+			require.Equal(t, `-- name: CreateItem :batchexec
+INSERT INTO
+    item (
+        payment_id,
+        name,
+        qty,
+        payment_object,
+        payment_method,
+        vat,
+        price,
+        agent
+    )
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8),($9,$10,$11,$12,$13,$14,$15,$16)
+`, sql)
+		}
 	})
 
 	t.Run("replace_multiline_where", func(t *testing.T) {

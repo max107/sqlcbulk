@@ -10,7 +10,7 @@ import (
 var (
 	insertValuesRegex = regexp.MustCompile(`(?i)values\s+\(([^)]+)\)`)
 	paramsRegex       = regexp.MustCompile(`(?i)(\$(\d+))`)
-	valuesRegex       = regexp.MustCompile(`(?ims)VALUES \((.*?)\)`)
+	valuesRegex       = regexp.MustCompile(`(?ims)values\s+\((.*?)\)`)
 )
 
 func FindColumns(sql string) []string {
