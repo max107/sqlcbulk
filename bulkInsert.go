@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	insertValuesRegex = regexp.MustCompile(`values\s+\(([^)]+)\)`)
-	paramsRegex       = regexp.MustCompile(`(\$(\d+))`)
+	insertValuesRegex = regexp.MustCompile(`(?i)values\s+\(([^)]+)\)`)
+	paramsRegex       = regexp.MustCompile(`(?i)(\$(\d+))`)
 	valuesRegex       = regexp.MustCompile(`(?ims)VALUES \((.*?)\)`)
 )
 
